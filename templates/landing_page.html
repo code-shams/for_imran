@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinky Motors | Find Your Dream Ride</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-[#fbeff2] font-sans m-0 p-0">
+    <section class="hero flex items-center px-4 py-8 sm:p-12 h-screen box-border" 
+             style="background-image: url('{% static 'images/landing_bg.webp' %}'); 
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;">
+        <div class="hero-content w-full flex flex-col">
+            <!-- Logo with responsive sizing and margins -->
+            <div class="logo -mt-8 ml-2 sm:mt-0 sm:ml-8">
+              <img src="{% static 'images/pinky_motors_logo.webp' %}" 
+                   alt="Pinky Motors Logo" 
+                   class="w-32 sm:w-40 md:w-50">
+            </div>
+            
+            <!-- Responsive headline -->
+            <div class="text ml-4 sm:ml-20">
+              <h2 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight sm:leading-tight uppercase -mt-2 sm:mt-20">
+                <span class="text-white">FIND YOUR</span><br>
+                <span class="text-[#ff5ebc]">DREAM</span> <span class="text-white">RIDE</span>
+              </h2>
+            </div>
+
+            
+<!-- Responsive button container -->
+<div class="flex justify-end w-full mt-8 sm:mt-12 px-4 sm:px-0">
+  <a href="#"
+     class="cta-button -mt-2 inline-block bg-[#ff5ebc] text-white py-3 pl-4 pr-2 sm:py-3 sm:px-10 rounded-full font-bold text-sm sm:text-base no-underline transition hover:bg-[#ff90d2] flex items-center justify-between group w-full sm:w-auto">
+     VISIT PAGE
+     <span class="ml-2 inline-block transition-transform group-hover:translate-x-1">
+        <!-- Responsive SVG arrow -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 16" class="w-12 sm:w-16 md:w-20 h-4" fill="currentColor">
+           <path d="M63.7 8.5l-7.4-7.4-1.4 1.4 5 5H0v2h59.3l-5 5 1.4 1.4 7.4-7.4z"/>
+        </svg>
+     </span>
+  </a>
+</div>
+
+
+        </div>
+    </section>
+</body>
+</html>
