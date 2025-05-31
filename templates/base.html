@@ -1,0 +1,347 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f9d3f4 0%, #f6b5da 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .navbar {
+            background-color: #ff5ebc;
+            box-shadow: 0 2px 10px rgba(255, 94, 188, 0.2);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .active-link {
+            border-bottom: 2px solid white;
+            font-weight: 600;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 120px);
+        }
+
+        .message {
+            animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-in 1.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Message Notification Container -->
+    <div id="message-container" class="fixed top-4 right-4 z-50 space-y-2 hidden">
+        <!-- Messages will be inserted here -->
+    </div>
+
+    <!-- Fixed Compact Navigation Bar -->
+    <nav class="navbar text-white px-3 shadow-md mx-4 my-2 rounded-full h-16 flex items-center z-50 relative"
+         style="background: linear-gradient(90deg, #843bff 0%, #d7a9ff 25%, #ff8cf7 60%, #ffadad 100%);">
+
+        <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
+            
+            <!-- Logo + Search -->
+            <div class="flex items-center gap-4 pl-2">
+                <img src="{% static 'images/pinky_motors_logo.webp' %}" alt="Logo" class="h-20 w-auto">
+                
+                <!-- Search -->
+                <div class="hidden sm:flex items-center space-x-2">
+                    <input type="text" placeholder="Search..."
+                           class="px-3 py-1 text-sm rounded-full bg-pink-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-300 w-44 md:w-60" />
+                    <button class="px-3 py-1 text-sm bg-pink-500 text-white rounded-full hover:bg-pink-600">
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="{% url 'homepage' %}" class="nav-link"><i class="fas fa-home mr-1"></i> Home</a>
+                <a href="#" class="nav-link"><i class="fas fa-sliders-h mr-1"></i> Filter</a>
+
+                <!-- Account Dropdown -->
+                <div class="relative" id="account-dropdown-container">
+                    <button id="account-dropdown-button" class="flex items-center space-x-1 nav-link">
+                        <i class="fas fa-user-circle text-lg"></i>
+                        <span>Account</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform" id="dropdown-chevron"></i>
+                    </button>
+                    <div id="account-dropdown"
+                         class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-1 hidden z-50 border border-gray-200">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 hover:bg-[#f0d5ff]">Profile</a>
+                            <a href="{% url 'user_logout' %}" class="block px-4 py-2 hover:bg-[#f0d5ff]">Logout</a>
+                        {% else %}
+                            <a href="{% url 'user_login' %}" class="block px-4 py-2 hover:bg-[#f0d5ff]">Login</a>
+                            <a href="{% url 'register' %}" class="block px-4 py-2 hover:bg-[#f0d5ff]">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden pr-2">
+                <button id="mobile-menu-button" class="text-white focus:outline-none p-2 rounded-full hover:bg-white/10">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="fixed inset-0 w-full h-full bg-black/50 z-40 hidden transition-opacity duration-300 opacity-0 pointer-events-none">
+                <div class="absolute top-16 right-0 w-3/4 bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 translate-x-full">
+                    <button id="mobile-menu-close" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+                        
+                    </button>
+                    <div class="mb-4">
+                        <input type="text" placeholder="Search..."
+                               class="w-full px-3 py-2 text-sm rounded-full bg-pink-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-300" />
+                    </div>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-pink-100 rounded">Home</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-pink-100 rounded">Filter</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-800 hover:bg-pink-100 rounded">Profile</a>
+                        <a href="{% url 'user_logout' %}" class="block px-4 py-2 text-gray-800 hover:bg-pink-100 rounded">Logout</a>
+                    {% else %}
+                        <a href="{% url 'user_login' %}" class="block px-4 py-2 text-gray-800 hover:bg-pink-100 rounded">Login</a>
+                        <a href="{% url 'register' %}" class="block px-4 py-2 text-gray-800 hover:bg-pink-100 rounded">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    showMessage('{{ message.tags }}', '{{ message }}');
+                </script>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}    
+        {% endblock %}
+    </main>
+    
+    <!-- Footer Section -->
+    <footer class="bg-[#ff5ebc] text-white py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <!-- Brand/Logo -->
+                <div class="mb-4 md:mb-0">
+                    <a href="{% url 'landing_page' %}" class="flex items-center">
+                        <img src="{% static 'images/pinky_motors_logo.webp' %}" 
+                             alt="Pinky Motors Logo" 
+                             class="h-auto w-[10rem] mr-2">                    
+                    </a>                
+                </div>
+
+                <!-- Quick Links -->
+                <div class="mb-4 md:mb-0">
+                    <h4 class="text-lg font-semibold mb-2">Quick Links</h4>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="hover:text-white hover:underline">Vehicles</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">About Us</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Contact</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Media -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-2">Connect With Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white hover:text-[#f9d3f4] transition-colors duration-300" 
+                           aria-label="Facebook">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-[#f9d3f4] transition-colors duration-300" 
+                           aria-label="Instagram">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-[#f9d3f4] transition-colors duration-300" 
+                           aria-label="Twitter">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-[#f9d3f4] transition-colors duration-300" 
+                           aria-label="YouTube">
+                            <i class="fab fa-youtube text-xl"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Newsletter -->
+                    <div class="mt-4">
+                        <h5 class="text-sm font-medium mb-2">Subscribe to our newsletter</h5>
+                        <form class="flex">
+                            <input type="email" placeholder="Your email" 
+                                   class="px-3 py-2 text-gray-800 rounded-l focus:outline-none w-full">
+                            <button type="submit" 
+                                    class="bg-[#f6b5da] hover:bg-[#f9d3f4] text-[#ff5ebc] px-4 py-2 rounded-r font-medium">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-[#ff90d2] mt-6 pt-4 text-center text-sm opacity-80">
+                <p>&copy; {% now "Y" %} Pinky Motors. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Functionality
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileMenuContent = mobileMenu.querySelector('div');
+
+        function openMobileMenu() {
+            mobileMenu.classList.remove('hidden');
+            setTimeout(() => {
+                mobileMenu.classList.remove('opacity-0');
+                mobileMenu.classList.remove('pointer-events-none');
+                mobileMenuContent.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeMobileMenu() {
+            mobileMenuContent.classList.add('translate-x-full');
+            mobileMenu.classList.add('opacity-0');
+            mobileMenu.classList.add('pointer-events-none');
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+            }, 300);
+        }
+
+        mobileMenuButton.addEventListener('click', openMobileMenu);
+        mobileMenuClose.addEventListener('click', closeMobileMenu);
+
+        // Close when clicking on overlay
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                closeMobileMenu();
+            }
+        });
+
+        // Close when clicking on links
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
+
+        // Dropdown functionality
+        const dropdownButton = document.getElementById('account-dropdown-button');
+        const dropdownMenu = document.getElementById('account-dropdown');
+        const chevron = document.getElementById('dropdown-chevron');
+
+        dropdownButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#account-dropdown-container')) {
+                dropdownMenu.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        });
+
+        // Message notification system
+        function showMessage(type, text) {
+            const container = document.getElementById('message-container');
+            const message = document.createElement('div');
+            
+            // Set base classes
+            let classes = "message px-4 py-3 rounded-lg shadow-lg text-white flex items-center";
+            
+            // Add type-specific classes
+            switch(type) {
+                case 'success':
+                    classes += " bg-green-500";
+                    break;
+                case 'error':
+                    classes += " bg-red-500";
+                    break;
+                case 'info':
+                    classes += " bg-blue-500";
+                    break;
+                case 'warning':
+                    classes += " bg-yellow-500";
+                    break;
+                default:
+                    classes += " bg-pink-500";
+            }
+            
+            message.className = classes;
+            message.innerHTML = `
+                <i class="fas ${getIcon(type)} mr-2"></i>
+                <span>${text}</span>
+            `;
+            
+            container.appendChild(message);
+            container.classList.remove('hidden');
+            
+            // Remove message after 2 seconds
+            setTimeout(() => {
+                message.remove();
+                if (container.children.length === 0) {
+                    container.classList.add('hidden');
+                }
+            }, 2000);
+        }
+
+        function getIcon(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-exclamation-circle';
+                case 'info': return 'fa-info-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                default: return 'fa-bell';
+            }
+        }
+
+        // Example usage (you can call this from your Django templates or other JS):
+        // showMessage('success', 'Profile updated successfully!');
+        // showMessage('error', 'Failed to save changes.');
+        // showMessage('info', 'New messages available.');
+        // showMessage('warning', 'Please verify your email.');
+    </script>
+</body>
+</html>

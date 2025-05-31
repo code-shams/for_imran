@@ -24,7 +24,10 @@ from django.urls import path, include
 from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='landing_page')
+    path('', views.home, name='landing_page'),
+    path('accounts/', include('accounts.urls')),       
+    path('cars/', include('cars.urls')),       
+    path('brands/', include('brands.urls')),       
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+<!-- Optional: Font integration -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+
+<div class="container mx-auto px-4 py-10 font-sans">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    {% for car in cars %}
+      <div class="bg-[#ffe9fb] border-4 border-[#ffcbde] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col leading-relaxed">
+        <img 
+          src="{{ car.image.url }}" 
+          alt="{{ car.brand.name }} {{ car.model }}" 
+          class="w-full h-48 object-cover rounded-t-2xl"
+        >
+
+        <div class="p-5 flex flex-col flex-grow">
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-2 mb-3">
+            <span class="bg-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+              {{ car.brand.name }}
+            </span>
+            <span class="{% if car.status == 'new' %}bg-green-500{% else %}bg-blue-500{% endif %} text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+              {{ car.get_status_display }}
+            </span>
+          </div>
+
+          <!-- Brand + Model -->
+          <p class="text-sm text-gray-500 font-medium mb-1 tracking-wide">
+            Model: 
+          </p>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 tracking-tight uppercase">
+            {{ car.model }}
+          </h3>
+
+          <!-- Price -->
+          <div class="mt-auto mb-4">
+            <div class="text-2xl font-extrabold text-rose-600 tracking-tight leading-tight flex items-baseline gap-1">
+              <span class="text-lg font-bold">৳</span>
+              <span>{{ car.price|floatformat:0 }}</span>
+              <span class="text-sm text-gray-400 font-medium ml-1">TAKA</span>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <button 
+            class="w-full bg-pink-500 hover:bg-pink-600 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition duration-200 mb-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            {% if car.quantity <= 0 %}disabled{% endif %}
+          >
+            {% if car.quantity <= 0 %}SOLD OUT{% else %}BUY NOW{% endif %}
+          </button>
+
+          <button 
+            class="w-full border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition duration-200"
+          >
+            VIEW DETAILS
+          </button>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-span-full text-center py-16">
+        <p class="text-gray-500 text-lg font-medium">No cars available at the moment.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
