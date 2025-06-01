@@ -5,7 +5,7 @@
 <div class="container mx-auto px-4 py-8 max-w-6xl">
     <div class="flex flex-col md:flex-row gap-8">
         <!-- Left Column - Profile Card -->
-        <div class="w-full md:w-1/3 bg-white rounded-xl shadow-md p-6 card_bg">
+        <div class="w-full md:w-1/3 h-1/2 bg-white rounded-xl shadow-md p-6 card_bg">
             <!-- Profile Picture -->
             <div class="text-center mb-6">
                 <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-pink-200 mb-4">
@@ -73,7 +73,7 @@
     <h2 class="text-2xl font-extrabold text-gray-800 mb-8 tracking-tight">Purchase History</h2>
 
     {% if purchases %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {% for purchase in purchases %}
         <div class="bg-[#fff4f9] border border-[#ffb6d1] rounded-2xl shadow-md hover:shadow-lg transition duration-300 flex flex-col">
             <!-- Car Image -->

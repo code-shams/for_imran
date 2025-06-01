@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-[#fbeff2] font-sans m-0 p-0">
-    <section class="hero flex items-center px-4 py-8 sm:p-12 h-screen box-border" 
+    <section class="hero flex  min-h-screen box-border" 
              style="background-image: url('{% static 'images/landing_bg.webp' %}'); 
                     background-size: cover;
                     background-position: center;
@@ -24,8 +24,8 @@
             </div>
             
             <!-- Responsive headline -->
-            <div class="text ml-4 sm:ml-20">
-              <h2 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight sm:leading-tight uppercase -mt-2 sm:mt-20">
+            <div class="text ml-4 sm:ml-20 mt-96 sm:mt-0 text-center sm:text-left">
+              <h2 class="text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight sm:leading-tight uppercase -mt-2 sm:mt-20">
                 <span class="text-white">FIND YOUR</span><br>
                 <span class="text-[#ff5ebc]">DREAM</span> <span class="text-white">RIDE</span>
               </h2>
@@ -33,9 +33,9 @@
 
             
 <!-- Responsive button container -->
-<div class="flex justify-end w-full mt-8 sm:mt-12 px-4 sm:px-0">
+<div class="flex justify-end w-full px-4 sm:px-0 mt-5 sm:absolute sm:bottom-10 sm:right-10">
   <a href = "{% url "homepage" %}"
-     class="cta-button -mt-2 inline-block bg-[#ff5ebc] text-white py-3 pl-4 pr-2 sm:py-3 sm:px-10 rounded-full font-bold text-sm sm:text-base no-underline transition hover:bg-[#ff90d2] flex items-center justify-between group w-full sm:w-auto">
+     class="cta-button inline-block bg-[#ff5ebc] text-white py-3 pl-4 pr-2 sm:py-3 sm:px-10 rounded-full font-bold text-sm sm:text-base no-underline transition hover:bg-[#ff90d2] flex items-center justify-between group w-full sm:w-auto">
      VISIT PAGE
      <span class="ml-2 inline-block transition-transform group-hover:translate-x-1">
         <!-- Responsive SVG arrow -->
