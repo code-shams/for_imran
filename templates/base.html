@@ -75,7 +75,9 @@
             
             <!-- Logo + Search -->
             <div class="flex items-center gap-4 pl-2">
-                <img src="{% static 'images/pinky_motors_logo.webp' %}" alt="Logo" class="h-20 w-auto">
+                <a href="{% url 'homepage' %}">
+                  <img src="{% static 'images/pinky_motors_logo.webp' %}" alt="Logo" class="h-20 w-auto">
+                </a>
                 
                 <!-- Search -->
                 <div class="hidden sm:flex items-center space-x-2">

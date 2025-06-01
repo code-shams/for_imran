@@ -8,8 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileUpdateForm, UserUpdateForm
 from .models import Profile
-
-
+from cars.models import Purchase
 
 
 
@@ -70,18 +69,23 @@ def user_logout(request):
    return redirect('user_login')
 
 
-# views.py (add these to your existing views)
-
-
 @login_required
 def profile(request):
+    # Get the user's purchases, ordered by most recent first
+    purchases = Purchase.objects.filter(user=request.user).order_by('-purchase_date')
+    
+    # Your existing form logic
     u_form = UserUpdateForm(instance=request.user)
     p_form = ProfileUpdateForm(instance=request.user.profile)
+    
     context = {
         'u_form': u_form,
         'p_form': p_form,
+        'purchases': purchases,  # Add purchases to the context
     }
     return render(request, 'profile.html', context)
+
+
 
 @login_required
 def edit_profile(request):

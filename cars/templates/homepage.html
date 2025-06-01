@@ -1,20 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}Homepage{% endblock %}
+{% block title %}Pinky Motors - Homepage{% endblock %}
 
 {% block content %}
-<!-- Optional: Font integration -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
 
 <div class="container mx-auto px-4 py-10 font-sans">
+  {% if messages %}
+    <div class="mb-8">
+      {% for message in messages %}
+        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     {% for car in cars %}
-      <div class="bg-[#ffe9fb] border-4 border-[#ffcbde] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col leading-relaxed">
-        <img 
-          src="{{ car.image.url }}" 
-          alt="{{ car.brand.name }} {{ car.model }}" 
-          class="w-full h-48 object-cover rounded-t-2xl"
-        >
+      <div class="bg-[#ffe9fb] border-4 border-[#ffcbde] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
+        <!-- Car Image with Loading State -->
+          <div class="relative overflow-hidden h-48 bg-gray-100 rounded-t-2xl">
+            <img 
+              src="{{ car.image.url }}" 
+              alt="{{ car.brand.name }} {{ car.model }}" 
+              class="w-full h-full object-cover transition-opacity duration-300 opacity-0" 
+              loading="lazy"
+              onload="this.classList.remove('opacity-0')"
+            >
+        </div>
 
         <div class="p-5 flex flex-col flex-grow">
           <!-- Tags -->
@@ -27,16 +41,17 @@
             </span>
           </div>
 
-          <!-- Brand + Model -->
-          <p class="text-sm text-gray-500 font-medium mb-1 tracking-wide">
-            Model: 
-          </p>
-          <h3 class="text-xl font-bold text-gray-900 mb-4 tracking-tight uppercase">
-            {{ car.model }}
-          </h3>
+          <!-- Car Details -->
+          <div class="mb-4">
+            <p class="text-sm text-gray-500 font-medium mb-1 tracking-wide">Model</p>
+            <h3 class="text-xl font-bold text-gray-900 tracking-tight uppercase line-clamp-2">
+              {{ car.model }}
+            </h3>
+          </div>
 
           <!-- Price -->
           <div class="mt-auto mb-4">
+            <p class="text-sm text-gray-500 font-medium mb-1">Price</p>
             <div class="text-2xl font-extrabold text-rose-600 tracking-tight leading-tight flex items-baseline gap-1">
               <span class="text-lg font-bold">৳</span>
               <span>{{ car.price|floatformat:0 }}</span>
@@ -44,26 +59,63 @@
             </div>
           </div>
 
-          <!-- Buttons -->
-          <button 
-            class="w-full bg-pink-500 hover:bg-pink-600 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition duration-200 mb-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
-            {% if car.quantity <= 0 %}disabled{% endif %}
-          >
-            {% if car.quantity <= 0 %}SOLD OUT{% else %}BUY NOW{% endif %}
-          </button>
+          <!-- Stock Status -->
+          <div class="mb-4">
+            <p class="text-sm text-gray-500 font-medium mb-1">Availability</p>
+            <p class="text-sm font-medium {% if car.quantity > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+              {% if car.quantity > 0 %}
+                {{ car.quantity }} in stock
+              {% else %}
+                Out of stock
+              {% endif %}
+            </p>
+          </div>
 
-          <button 
-            class="w-full border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition duration-200"
-          >
-            VIEW DETAILS
-          </button>
+          <!-- Action Buttons -->
+          <div class="mt-auto space-y-2">
+            {% if car.quantity > 0 %}
+              <a href="{% if not user.is_authenticated %}{% url 'user_login' %}?next={% url 'car_detail' car.id %}{% else %}{% url 'car_detail' car.id %}{% endif %}"
+                class="block w-full bg-pink-500 hover:bg-pink-600 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition duration-200 text-center"
+                {% if not user.is_authenticated %}title="Login to purchase"{% endif %}>
+                {% if not user.is_authenticated %}LOGIN TO BUY{% else %}BUY NOW{% endif %}
+              </a>
+            {% else %}
+              <button class="w-full bg-gray-300 text-gray-500 text-sm font-semibold py-2.5 px-4 rounded-lg cursor-not-allowed" disabled>
+                SOLD OUT
+              </button>
+            {% endif %}
+
+            <a href="{% url 'car_detail' car.id %}" 
+              class="block w-full border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition duration-200 text-center">
+              VIEW DETAILS
+            </a>
+          </div>
         </div>
       </div>
     {% empty %}
       <div class="col-span-full text-center py-16">
-        <p class="text-gray-500 text-lg font-medium">No cars available at the moment.</p>
+        <div class="max-w-md mx-auto">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-lg font-medium text-gray-900">No cars available</h3>
+          <p class="mt-1 text-gray-500">Check back later for new arrivals.</p>
+        </div>
       </div>
     {% endfor %}
   </div>
 </div>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
 {% endblock %}

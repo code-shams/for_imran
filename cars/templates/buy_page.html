@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Buy {{ car.brand.name }} {{ car.model }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-10 px-4">
+  <div class="max-w-5xl mx-auto bg-white rounded-[30px] border-2 border-[#FFC7DE] p-8 shadow-lg">
+
+    <!-- Title -->
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Payment Confirmation</h1>
+
+    <!-- Grid: Car Info & Form -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Left: Car Image + Info -->
+      <div class="space-y-6">
+        <img src="{{ car.image.url }}" alt="Car Image" class="rounded-[25px] w-full h-60 object-cover border-2 border-[#FFA3C2]">
+        <div class="bg-[#FFF0F5] rounded-[20px] p-6 text-gray-700 space-y-2 border border-[#FFC7DE]">
+          <p><span class="font-semibold">Brand:</span> {{ car.brand.name }}</p>
+          <p><span class="font-semibold">Model:</span> {{ car.model }}</p>
+          <p><span class="font-semibold">Status:</span> Used</p>
+          <p><span class="font-semibold">Price:</span> ৳{{ car.price|floatformat:0 }}</p>
+        </div>
+      </div>
+
+      <!-- Right: User Info + Payment -->
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- User Info -->
+        <div class="space-y-2">
+          <p class="text-sm text-gray-500">NAME</p>
+          <p class="text-lg font-bold">{{ user.get_full_name|default:user.username }}</p>
+        </div>
+        <div class="space-y-2">
+          <p class="text-sm text-gray-500">EMAIL</p>
+          <p class="text-lg font-bold">{{ user.email }}</p>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="mt-4">
+          {{ form.shipping_address }}
+        </div>
+
+        <!-- Payment Method -->
+        <div class="space-y-2">
+          <p class="text-sm font-bold">SELECT PAYMENT METHOD</p>
+          <div class="flex flex-wrap gap-4">
+            {% for value, label in form.fields.payment_method.choices %}
+              <label class="bg-[#FFE4EC] px-4 py-2 rounded-[15px] cursor-pointer hover:bg-[#FFCCE0] flex items-center gap-2 text-sm">
+                <input type="radio" name="payment_method" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+                {{ label }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Agreement Checkbox -->
+        <div class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="agreement" required class="accent-pink-400">
+          <label>Accept agreement, <a href="#" class="underline text-blue-600">Read...</a></label>
+        </div>
+
+        <!-- Hidden Fields -->
+        <input type="hidden" name="quantity" value="{{ quantity }}">
+
+        <!-- Confirm Button -->
+        <div class="text-center mt-6">
+          <button type="submit" class="bg-[#FF74A4] hover:bg-[#ff5c93] text-white font-bold py-3 px-10 rounded-[25px] transition">
+            CONFIRM PURCHASE
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Bottom Table -->
+    <div class="mt-10 overflow-x-auto">
+      <table class="w-full text-sm text-center border border-[#FFC7DE] rounded-[20px] overflow-hidden">
+        <thead class="bg-[#FFE4EC] font-bold text-gray-800">
+          <tr>
+            <th class="py-2 px-4">BRAND</th>
+            <th class="py-2 px-4">MODEL</th>
+            <th class="py-2 px-4">QUANTITY</th>
+            <th class="py-2 px-4">FINAL PRICE</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white text-gray-700">
+          <tr class="border-t border-pink-200">
+            <td class="py-2 px-4">{{ car.brand.name }}</td>
+            <td class="py-2 px-4">{{ car.model }}</td>
+            <td class="py-2 px-4">*{{ quantity }}</td>
+            <td class="py-2 px-4">৳{{ total_price|floatformat:0 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

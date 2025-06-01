@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+  <!-- Load Google Fonts only once in the head -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+{% endblock %}
+
+{% block title %}{{ car.brand.name }} {{ car.model }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto mt-16 font-sans px-4">
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Image Section -->
+    <div class="w-full lg:w-1/2 flex justify-center">
+      <div class="border-4 border-[#ffcbde] rounded-2xl shadow-lg overflow-hidden max-w-4xl h-[400px] w-full flex items-center justify-center">
+        {% if car.image %}
+          <img 
+            src="{{ car.image.url }}" 
+            alt="{{ car.brand.name }} {{ car.model }}" 
+            class="w-full h-full object-cover"
+            loading="lazy"
+          >
+        {% else %}
+          <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+            No Image Available
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="w-full lg:w-1/2">
+      <div class="bg-[#ffe9fb] border-4 border-[#ffcbde] rounded-2xl shadow-lg p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1 uppercase tracking-tight">{{ car.brand.name }}</h1>
+        <h2 class="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tighter">{{ car.model }}</h2>
+
+        <div class="flex flex-wrap gap-4 mb-8">
+          <div>
+            <p class="text-xs text-gray-500 font-medium mb-1">BRAND</p>
+            <span class="bg-pink-500 text-white text-base font-bold px-4 py-1 rounded-full">{{ car.brand.name }}</span>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium mb-1">STATUS</p>
+            <span 
+              class="{% if car.status == 'new' %}bg-green-500{% else %}bg-blue-500{% endif %} 
+                     text-white text-base font-bold px-4 py-1 rounded-full"
+            >
+              {{ car.get_status_display }}
+            </span>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <p class="text-xs text-gray-500 font-medium mb-1">PRICE</p>
+          <div class="text-3xl font-black text-rose-600 tracking-tight flex items-baseline gap-2">
+            <span aria-label="currency symbol">৳</span>
+            <span>{{ car.price|floatformat:0 }}</span>
+            <span class="text-lg text-gray-400 font-medium">TAKA</span>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <p class="text-xs text-gray-500 font-medium mb-1">STOCKS</p>
+          <div class="text-xl font-bold text-gray-900" aria-live="polite">
+            {% if car.quantity > 0 %}{{ car.quantity }} LEFT{% else %}SOLD OUT{% endif %}
+          </div>
+        </div>
+
+        <div class="mb-10">
+          <p class="text-xs text-gray-500 font-medium mb-3">QUANTITY</p>
+          <div class="flex items-center" role="spinbutton" aria-valuemin="1" aria-valuemax="{{ car.quantity }}" aria-valuenow="1" tabindex="0">
+            <button 
+              type="button" 
+              class="bg-pink-500 text-white w-12 h-12 text-xl font-bold rounded-l-lg hover:bg-pink-600 transition" 
+              id="decrease-qty" 
+              {% if not user.is_authenticated or car.quantity <= 0 %}disabled{% endif %}
+              aria-label="Decrease quantity"
+            >-</button>
+            <input 
+              type="number" 
+              value="1" 
+              min="1" 
+              max="{{ car.quantity }}"
+              class="w-20 h-12 text-xl font-bold text-center border-y-2 border-[#ffcbde] focus:outline-none"
+              id="quantity-input"
+              name="quantity"
+              {% if not user.is_authenticated or car.quantity <= 0 %}disabled{% endif %}
+              aria-live="polite"
+              aria-label="Quantity input"
+            >
+            <button 
+              type="button" 
+              class="bg-pink-500 text-white w-12 h-12 text-xl font-bold rounded-r-lg hover:bg-pink-600 transition" 
+              id="increase-qty" 
+              {% if not user.is_authenticated or car.quantity <= 0 %}disabled{% endif %}
+              aria-label="Increase quantity"
+            >+</button>
+          </div>
+        </div>
+
+        <!-- BUY NOW Button Updated -->
+        {% if user.is_authenticated %}
+          <form method="get" action="{% url 'buy_car' car.id %}">
+            <input type="hidden" name="quantity" id="quantity-input-submit" value="1">
+            <button 
+              type="submit"
+              class="w-full bg-pink-500 hover:bg-pink-600 text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-200 mb-6 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              {% if car.quantity <= 0 %}disabled{% endif %}
+              id="buy-button"
+              aria-disabled="{% if car.quantity <= 0 %}true{% else %}false{% endif %}"
+            >
+              {% if car.quantity <= 0 %}SOLD OUT{% else %}BUY NOW{% endif %}
+            </button>
+          </form>
+        {% else %}
+          <a href="{% url 'user_login' %}" class="w-full block text-center bg-pink-500 hover:bg-pink-600 text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-200 mb-6" role="button">
+            LOGIN TO BUY
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Description Section -->
+<div class="container mx-auto px-4 mt-12">
+  <div class="bg-[#ffe9fb] border-4 border-[#ffcbde] rounded-2xl shadow-lg p-8">
+    <h3 class="text-3xl font-bold text-gray-900 mb-6">DESCRIPTION:</h3>
+    <p class="text-gray-700 leading-relaxed text-lg whitespace-pre-line">{{ car.description }}</p>
+  </div>
+</div>
+
+<!-- Comment Section -->
+<div class="container mx-auto px-4 mt-12">
+  <div class="bg-[#ffe9fb] border-4 border-[#ffcbde] rounded-2xl shadow-lg p-8">
+    <h3 class="text-2xl font-bold text-gray-900 mb-6">ADD A COMMENT...</h3>
+
+    <form method="post" class="mb-12">
+      {% csrf_token %}
+      <div class="flex items-start gap-4 mb-4">
+        <div class="bg-gray-200 border-2 border-dashed rounded-full overflow-hidden w-16 h-16 flex-shrink-0">
+          <img src="{% if user.profile.image_url %}{{ user.profile.image_url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}"
+            class="w-full h-full object-cover"
+            alt="{% if user.profile.image %}Profile picture of {{ user.get_full_name|default:user.username }}{% else %}Default profile avatar{% endif %}"
+            loading="lazy">
+        </div>
+
+        <div class="flex-1">
+          {% if user.is_authenticated %}
+            <p class="font-bold text-gray-900 mb-1">{{ user.username }}</p>
+            {{ form.text }}
+          {% else %}
+            <input type="text" name="guest_name" placeholder="Your Name" required 
+                   class="mb-2 px-3 py-2 border rounded w-full focus:ring-2 focus:ring-pink-500 focus:border-transparent" 
+                   aria-label="Guest name">
+            {{ form.text }}
+            <p class="text-sm text-gray-500 italic mt-1">You are commenting as guest.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="bg-pink-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-pink-600 transition flex items-center gap-2" aria-label="Post comment">
+          POST
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <div class="border-t-2 border-[#ffcbde] pt-8">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6">COMMENTS</h3>
+      {% for comment in comments %}
+        <div class="flex items-start gap-4 mb-6">
+          <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-dashed border-gray-300 flex-shrink-0">
+            <img 
+              src="{% if comment.user.profile.image_url %}{{ comment.user.profile.image_url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
+              class="w-full h-full object-cover"
+              alt="Commenter Avatar"
+              loading="lazy"
+            >
+          </div>
+          <div>
+            <p class="font-bold text-gray-800">{{ comment.user.username }}</p>
+            <p class="text-gray-700">{{ comment.text }}</p>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-gray-500">No comments yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const decreaseBtn = document.getElementById('decrease-qty');
+    const increaseBtn = document.getElementById('increase-qty');
+    const quantityInput = document.getElementById('quantity-input');
+    const quantitySubmit = document.getElementById('quantity-input-submit');
+
+    if (decreaseBtn && increaseBtn && quantityInput && quantitySubmit) {
+      // Handle decrease button click
+      decreaseBtn.addEventListener('click', function() {
+        if (parseInt(quantityInput.value) > 1) {
+          quantityInput.value = parseInt(quantityInput.value) - 1;
+          quantitySubmit.value = quantityInput.value;
+        }
+      });
+
+      // Handle increase button click
+      increaseBtn.addEventListener('click', function() {
+        const max = parseInt(quantityInput.max);
+        if (parseInt(quantityInput.value) < max) {
+          quantityInput.value = parseInt(quantityInput.value) + 1;
+          quantitySubmit.value = quantityInput.value;
+        }
+      });
+
+      // Handle direct input changes
+      quantityInput.addEventListener('change', function() {
+        let value = parseInt(this.value);
+        if (isNaN(value) || value < 1) {
+          value = 1;
+        } else if (value > parseInt(this.max)) {
+          value = parseInt(this.max);
+        }
+        this.value = value;
+        quantitySubmit.value = value;
+      });
+
+      // Initialize the hidden field
+      quantitySubmit.value = quantityInput.value;
+    }
+  });
+</script>
+{% endblock %}

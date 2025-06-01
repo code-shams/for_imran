@@ -5,6 +5,7 @@ from .models import Profile
 
 
 
+
 class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'id': 'required'}))
     last_name = forms.CharField(widget=forms.TextInput(attrs={'id': 'required'}))
@@ -42,3 +43,5 @@ class ProfileUpdateForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={'class': 'w-full px-3 py-2 border rounded'}),
             'image': forms.FileInput(attrs={'class': 'w-full'}),
         }
+
+
